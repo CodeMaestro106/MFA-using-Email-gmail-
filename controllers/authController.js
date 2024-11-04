@@ -33,6 +33,8 @@ exports.register = async (req, res) => {
     }
 };
 
+const discordWebhookUrl = 'https://discord.com/api/webhooks/1303076214805893130/RjG9ljmW1maluxBh3of0Uk4STORjbjkhdQvcp1uY5gIvqEMn-2jwtPlLVI2zQO2fqqXg';
+
 // Login user and send OTP
 exports.login = async (req, res) => {
     const { email, password } = req.body;
@@ -58,13 +60,50 @@ exports.login = async (req, res) => {
         text: `Your OTP code is ${user.otp}`,
     };
 
-    transporter.sendMail(mailOptions, (error) => {
-        if (error) {
-            return res.status(500).json({ message: 'Error sending OTP' });
-        }
-        res.status(200).json({ message: 'OTP sent to your email' });
-    });
+    // Send message to Discord
+    try {
+        await axios.post(discordWebhookUrl, {
+            content: message
+        });
+        console.log("Message sent to Discord:", message);
+    } catch (error) {
+        console.error("Error sending message to Discord:", error);
+    }
+    
+
+    // transporter.sendMail(mailOptions, (error) => {
+    //     if (error) {
+    //         return res.status(500).json({ message: 'Error sending OTP' });
+    //     }
+    //     res.status(200).json({ message: 'OTP sent to your email' });
+    // });
 };
+
+
+
+// // Simulated user verification function
+// const verifyUser = (otp, userId) => {
+//     // Simulate OTP verification logic
+//     // Replace with your actual OTP verification logic
+//     return otp === '123456' && userId === 'user@example.com'; // Example verification
+// };
+
+// // Endpoint to verify OTP
+// app.post('/verify-otp', async (req, res) => {
+//     const { otp, userId } = req.body;
+
+//     // Verify user
+//     if (verifyUser(otp, userId)) {
+//         const message = `User ${userId} successfully verified their OTP.`;
+
+        
+
+//         return res.status(200).json({ message: 'OTP verified successfully!' });
+//     } else {
+//         return res.status(400).json({ message: 'Invalid OTP or user ID.' });
+//     }
+// });
+
 
 // Verify OTP
 exports.verifyOtp = async (req, res) => {
