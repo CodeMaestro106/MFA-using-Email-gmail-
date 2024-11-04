@@ -85,3 +85,42 @@ exports.verifyOtp = async (req, res) => {
 
     res.status(200).json({ message: 'OTP verified successfully', token });
 };
+
+
+exports.updateUser = async (req, res, next) => {
+    const { id } = req.params;
+    const { name, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    try {
+        const [updated] = await User.update({ name, email, hashedPassword }, { where: { id } });
+        if (!updated) {
+            return res.status(404).send('User not found');
+        }
+        const updatedUser = await User.findByPk(id);
+        res.json(updatedUser);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.deleteUser = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+        const deleted = await User.destroy({ where: { id } });
+        if (!deleted) {
+            return res.status(404).send('User not found');
+        }
+        res.sendStatus(204);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.getAllUsers = async (req, res, next) => {
+    try {
+        const users = await User.findAll();
+        res.json(users);
+    } catch (err) {
+        next(err);
+    }
+};
