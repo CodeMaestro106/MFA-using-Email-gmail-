@@ -33,7 +33,6 @@ exports.register = async (req, res) => {
     }
 };
 
-const discordWebhookUrl = 'https://discord.com/api/webhooks/1303076214805893130/RjG9ljmW1maluxBh3of0Uk4STORjbjkhdQvcp1uY5gIvqEMn-2jwtPlLVI2zQO2fqqXg';
 
 // Login user and send OTP
 exports.login = async (req, res) => {
@@ -60,23 +59,14 @@ exports.login = async (req, res) => {
         text: `Your OTP code is ${user.otp}`,
     };
 
-    // Send message to Discord
-    try {
-        await axios.post(discordWebhookUrl, {
-            content: message
-        });
-        console.log("Message sent to Discord:", message);
-    } catch (error) {
-        console.error("Error sending message to Discord:", error);
-    }
-    
 
-    // transporter.sendMail(mailOptions, (error) => {
-    //     if (error) {
-    //         return res.status(500).json({ message: 'Error sending OTP' });
-    //     }
-    //     res.status(200).json({ message: 'OTP sent to your email' });
-    // });
+
+    transporter.sendMail(mailOptions, (error) => {
+        if (error) {
+            return res.status(500).json({ message: 'Error sending OTP' });
+        }
+        res.status(200).json({ message: 'OTP sent to your email' });
+    });
 };
 
 
